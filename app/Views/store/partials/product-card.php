@@ -6,7 +6,7 @@ if (!empty($p['compare_price']) && $p['compare_price'] > $p['price']) {
     $discount = round((1 - $p['price'] / $p['compare_price']) * 100);
 }
 ?>
-<div class="product-card">
+<article class="product-card">
   <a href="<?= url('products/' . $p['slug']) ?>">
     <div class="product-card-img">
       <?php if (!empty($p['thumbnail'])): ?>
@@ -19,7 +19,7 @@ if (!empty($p['compare_price']) && $p['compare_price'] > $p['price']) {
       <?php elseif ($p['is_featured'] ?? 0): ?>
         <span class="product-card-badge" style="background:var(--gold);color:#000">⭐ مميز</span>
       <?php endif; ?>
-      <button class="product-card-wishlist" onclick="event.preventDefault();toggleWishlist(<?= $p['id'] ?>,this)" title="أضف للمفضلة">🤍</button>
+      <button class="product-card-wishlist" onclick="event.preventDefault();toggleWishlist(<?= $p['id'] ?>,this)" title="أضف للمفضلة" aria-label="أضف <?= e($p['name']) ?> للمفضلة">🤍</button>
     </div>
   </a>
   <div class="product-card-body">
@@ -43,10 +43,10 @@ if (!empty($p['compare_price']) && $p['compare_price'] > $p['price']) {
         <?php endif; ?>
       </div>
       <?php if (($p['stock'] ?? 1) > 0 || !($p['track_stock'] ?? 1)): ?>
-        <button class="product-card-add" onclick="addToCart(<?= $p['id'] ?>)" title="أضف للسلة">+</button>
+        <button class="product-card-add" onclick="addToCart(<?= $p['id'] ?>)" title="أضف للسلة" aria-label="أضف <?= e($p['name']) ?> للسلة">+</button>
       <?php else: ?>
         <span style="font-size:11px;color:var(--text3)">نفذ</span>
       <?php endif; ?>
     </div>
   </div>
-</div>
+</article>

@@ -12,11 +12,11 @@ class Router
     }
 
     public function dispatch(): void {
-        // LiteSpeed fix: read REQUEST_URI directly, not $_GET['url']
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        if (($pos = strpos($uri, '?')) !== false) $uri = substr($uri, 0, $pos);
-        $url    = trim(rawurldecode($uri), '/');
+        $url    = $this->currentPath();
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        if ($method === 'HEAD') {
+            $method = 'GET';
+        }
 
         foreach ($this->routes as $r) {
             $params = $this->match($r['path'], $url);
@@ -26,6 +26,37 @@ class Router
             return;
         }
         $this->abort404();
+    }
+
+    private function currentPath(): string {
+        $uri = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        $path = rawurldecode($path);
+
+        $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        $scriptDir  = trim(dirname($scriptName), '/');
+        if ($scriptDir !== '' && trim($path, '/') === $scriptDir) {
+            $path = '';
+        } elseif ($scriptDir !== '' && str_starts_with(trim($path, '/'), $scriptDir . '/')) {
+            $path = substr(trim($path, '/'), strlen($scriptDir) + 1);
+        } else {
+            $path = trim($path, '/');
+        }
+
+        if (str_starts_with($path, 'index.php/')) {
+            $path = substr($path, strlen('index.php/'));
+        } elseif ($path === 'index.php') {
+            $path = '';
+        }
+
+        $appPath = trim((string) parse_url(defined('APP_URL') ? APP_URL : '', PHP_URL_PATH), '/');
+        if ($appPath !== '' && str_starts_with($path, $appPath . '/')) {
+            $path = substr($path, strlen($appPath) + 1);
+        } elseif ($path === $appPath) {
+            $path = '';
+        }
+
+        return trim($path, '/');
     }
 
     private function match(string $route, string $url): array|false {
