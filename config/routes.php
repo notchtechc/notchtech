@@ -10,6 +10,8 @@ $admin = ADMIN_PREFIX;
 // Home
 $router->get('', 'StoreController@home');
 $router->get('products', 'StoreController@products');
+$router->get('collections', 'StoreController@products');
+$router->get('brands', 'StoreController@products');
 $router->get('products/{slug}', 'StoreController@product');
 $router->get('collections/{slug}', 'StoreController@collection');
 $router->get('brands/{slug}', 'StoreController@brand');
